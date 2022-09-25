@@ -1,0 +1,22 @@
+use database "HR_NEW_DATABASE";
+
+create or replace table consum_complaints_AWS like
+HR_CONSUMER_COMPLAINTS;
+
+select * from consum_complaints_AWS;
+list @AWS_TEST;
+copy into  consum_complaints_AWS FROM @AWS_TEST
+file_format =(TYPE = CSV FIELD_DELIMITER = "," SKIP_HEADER=1)
+PURGE=TRUE;
+
+SELECT * FROM  consum_complaints_AWS;
+
+SELECT DISTINCT DATE_RECEIVED FROM consum_complaints_AWS;
+
+select (date_recieved)  ;
+
+SELECT DISTINCT (extract(year from ( to_date (DATE_RECEIVED,'dd-mm-yyyy'))))
+FROM consum_complaints_AWS ;
+
+SELECT * FROM consum_complaints_AWS
+where DATE_RECEIVED = '6/8/2013';
