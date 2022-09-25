@@ -1,0 +1,154 @@
+select * from "SNOWFLAKE_SAMPLE_DATA"."TPCH_SF10"."LINEITEM";
+select * from "SNOWFLAKE_SAMPLE_DATA"."TPCH_SF10"."ORDERS";
+select count (*) from "SNOWFLAKE_SAMPLE_DATA"."TPCH_SF10"."LINEITEM";
+
+create database HR_New_database;
+use database HR_New_database;
+CREATE TABLE  CONSUMER_COMPLAINTS 
+   (	
+      DATE_RECEIVED STRING,
+      PRODUCT_NAME VARCHAR2(100) , 
+	  SUB_PRODUCT VARCHAR2(100) , 
+	  ISSUE VARCHAR2(100), 
+      SUB_ISSUE VARCHAR2(100),
+      CONSUMER_COMPLAINT_NARRATIVE VARCHAR2(100),
+      Company_Public_Response STRING,
+      Company VARCHAR(100),
+      State_Name CHAR(10),
+      Zip_Code INTEGER,
+      Tags VARCHAR(100),
+      Consumer_Consent_Provided CHAR(100),
+       Submitted_via STRING,
+      Date_Sent_to_Company STRING,
+      Company_Response_to_Consumer VARCHAR(100),
+      Timely_Response CHAR(100),
+      CONSUMER_DISPUTED CHAR(100),
+     COMPLAINT_ID NUMBER(12,0) NOT NULL PRIMARY KEY
+);
+
+create or replace file format my_Testing_format
+  type = csv
+  record_delimiter = '\n'
+  field_delimiter = ','
+  skip_header = 1
+  null_if = ('NULL', 'null')
+  empty_field_as_null = true;
+  
+  CREATE OR REPLACE TABLE HR_OWNER
+(
+   OwnerID INTEGER NOT NULL PRIMARY KEY ,
+   Name VARCHAR2(20),
+   Surname STRING,
+   StreetAddress VARCHAR2(50),
+   City STRING,
+   State CHAR(4),
+   StateFull STRING,
+   ZipCode INTEGER
+);
+use "HR_NEW_DATABASE";
+
+CREATE OR REPLACE TABLE HR_PETS
+(
+    PetID VARCHAR(10) NOT NULL PRIMARY KEY,
+    Name VARCHAR(20),
+    Kind STRING,
+    Gender CHAR(7),
+    Age INTEGER,
+    OwnerID INTEGER NOT NULL REFERENCES HR_OWNER 
+);
+  
+  select * from "HR_NEW_DATABASE"."PUBLIC"."HR_OWNER";
+  
+  select * from "HR_NEW_DATABASE"."PUBLIC"."HR_PETS";
+  
+  --FINDING THE LIST OF OWNERS WHO HAVE PETS.
+  
+  SELECT OWNERID AS O
+  FROM HR_OWNER
+  SELECT OWNERID AS P
+  FROM HR_PETS;
+  
+ SELECT O.OwnerID, O.NAME
+ FROM HR_OWNER O
+ LEFT OUTER JOIN HR_PETS P 
+ ON O.OWNERID = P.OWNERID 
+ WHERE P.KIND IS NOT NULL;
+ 
+ Drop table HR_CONSUMER_COMPLAINTS;
+ use database HR_New_database;
+ CREATE or replace table HR_CONSUMER_COMPLAINTS
+     (	
+      DATE_RECEIVED STRING,
+      PRODUCT_NAME VARCHAR2(50), 
+	  SUB_PRODUCT VARCHAR2(100), 
+	  ISSUE VARCHAR2(100), 
+      SUB_ISSUE VARCHAR2(100),
+      CONSUMER_COMPLAINT_NARRATIVE string,
+      Company_Public_Response STRING,
+      Company VARCHAR(100),
+      State_Name CHAR(4),
+      Zip_Code string,
+      Tags VARCHAR(60),
+      Consumer_Consent_Provided CHAR(25),
+      Submitted_via STRING,
+      Date_Sent_to_Company STRING,
+      Company_Response_to_Consumer VARCHAR(40),
+      Timely_Response CHAR(4),
+      CONSUMER_DISPUTED CHAR(4),
+      COMPLAINT_ID NUMBER(12,0) NOT NULL PRIMARY KEY
+);
+select * from HR_CONSUMER_COMPLAINTS;
+select distinct(product_name) from HR_CONSUMER_COMPLAINTS;
+
+SELECT *,
+    CASE
+        WHEN PRODUCT_NAME IN ('Consumer Loan','Student Loan', 'Payday Loan') THEN 'CSP_LOAN'
+        ELSE 'OTHER_FINAN_SERVICE'
+        END AS LOAN_TYPE
+FROM "HR_CONSUMER_COMPLAINTS" ;       
+
+SELECT * FROM "HR_CONSUMER_COMPLAINTS"
+where Loan_Type = 'CSP_LOAN';
+
+SELECT DISTINCT DATE_RECEIVED FROM HR_CONSUMER_COMPLAINTS ;
+
+To_DATE (DATE_RECEIVED as DD-MM_YYYY) FROM HR_CONSUMER_COMPLAINTS ;
+
+--HOW TO SELECT YEAR ONLY WHEN THE DATE TYPE IS STRING;
+select (date_recieved)  ;
+SELECT DISTINCT (extract(year from ( to_date (DATE_RECEIVED,'dd-mm-yyyy')))) 
+FROM "HR_CONSUMER_COMPLAINTS";
+
+select data type(date_received)from HR_consumer_complaints;
+
+select date_received,data type from HR_CONSUMER_COMPLAINTS ;
+
+select to_date (date_received,'dd-mm-yyyy') from HR_CONSUMER_COMPLAINTS;
+--or
+select cast(DATE_RECEIVED as date) from HR_CONSUMER_COMPLAINTS ;
+
+SELECT DISTINCT SUBSTRING(DATE_RECEIVED,7,12)FROM HR_CONSUMER_COMPLAINTS ;
+
+SELECT REPLACE('08-06--2013','08-06--2013', '08-06-2013');
+
+update HR_CONSUMER_COMPLAINTS
+set DATE_RECEIVED ='-'
+where DATE_RECEIVED ='--';
+
+select DATE_RECEIVED from HR_CONSUMER_COMPLAINTS
+where DATE_RECEIVED like '%%--%%';
+
+update HR_CONSUMER_COMPLAINTS
+set DATE_RECEIVED='%-2013'
+where date_received='%--2013';
+
+Select replace ('-','--') in DATE_RECEIVED;
+
+
+Select DATE_RECEIVED,replace (DATE_RECEIVED,'--','-') 
+from  HR_CONSUMER_COMPLAINTS
+where DATE_RECEIVED like'%--%';
+
+update HR_CONSUMER_COMPLAINTS set DATE_RECEIVED = replace(DATE_RECEIVED,'--','-') 
+
+where DATE_RECEIVED like'%--%';
