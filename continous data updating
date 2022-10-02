@@ -1,0 +1,39 @@
+use database "HR_NEW_DATABASE";
+
+CREATE OR REPLACE TABLE HR_OWNER
+
+(
+patient_ID INT,
+first_name VARCHAR(100),
+City varchar(100),
+registeration_year INT
+);
+
+
+
+create or replace storage integration s3_int --(s3_int is an allias)
+type = external_stage
+storage_provider = s3
+enabled = true
+storage_AWS_role_arn = 'arn:aws:iam::710375396609:role/snowpipe-injestion-data'
+storage_allowed_locations =('s3://1patientdatasnowpipe/');
+
+CREATE OR REPLACE  STAGE owner_SNOW_STAGE
+URL= 'S3://1patientdatasnowpipe'
+--CREDENTIALS = (AWS_KEY_ID = 'AKIA2KZNMKUAS5LVANKZ' AWS_SECRET_KEY = 'itz1GfpCv5za5xJhqGOhEIr+X3hQJnYp2dWbTLox'
+);
+
+SHOW STAGES;
+--CREATE SNOW PIPE THAT RECOGNISES CSV THAT ARE INGESTED FROM EXTERNAL STAGEAND COPIES THE DATA INTO PATIENTS TABLE
+
+--kms key arn:aws:kms:ap-northeast-1:710375396609:key/78276722-0453-41a5-86f1-f0a28e05c011
+
+CREATE OR REPLACE PIPE PATIENTS_SNOWPIPE AUTO_INGEST = TRUE AS
+
+COPY INTO PATIENTS
+FROM @PATIENTS_SNOW_STAGE
+FILE_FORMAT = csv;
+
+SHOW PIPES;
+select count(*)
+SELECT * FROM PATIENTS;
